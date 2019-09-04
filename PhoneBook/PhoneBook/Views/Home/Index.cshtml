@@ -1,0 +1,123 @@
+﻿@model PhoneBook.Models.DashboardViewModel
+@{
+    ViewBag.Title = "PhoneBook";
+
+    string Success = "";
+    string Error = "";
+
+    if(Request.QueryString["Message"] != null && Request.QueryString["Message"].ToString() !=" ")
+    {
+        Success = Request.QueryString["Message"].ToString();
+    }
+    if (Request.QueryString["Error"] != null && Request.QueryString["Error"].ToString() != " ")
+    {
+        Error = Request.QueryString["Error"].ToString();
+    }
+
+}
+<br/>
+<div class="row">
+    @if (Success != "")
+    {
+        <div class="suc-block text-success">@Success</div><br />
+    }
+    @if (Error != "")
+    {
+        <div class="err-block text-danger">@Error</div><br />
+    }
+
+    <div class="col-md-4">
+        <h2>New Contact</h2>
+        <p>
+            @using (Html.BeginForm("AddPhoneNumber", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <h4>Add Details</h4>
+                <hr />
+                @Html.ValidationSummary("", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    <label class="col-md-4 pull-left">Name</label>
+                    <div class="col-md-8 pull-right">
+                        <input type="text" name="Name" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 pull-left">Surname</label>
+                    <div class="col-md-8 pull-right">
+                        <input type="text" name="Surname" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 pull-left">Phone Number</label>
+                    <div class="col-md-8 pull-right">
+                        <input type="text" name="Number" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <lable class="col-md-4"></lable>
+                    <div class="col-md-8">
+                        <input type="submit" class="btn btn-default" value="Add" />
+                    </div>
+                </div>
+            }
+
+            @section Scripts {
+                @Scripts.Render("~/bundles/jqueryval")
+            }
+        </p>
+    </div>
+    <div class="col-md-8">
+        <h2>My Contacts</h2>
+        <p>
+            @using (Html.BeginForm("Index", "Home", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-group col-md-8 pull-right">
+                    <div class="col-md-7">
+                        <input type="text" name="Search" class="form-control" placeholder="Search for...">
+                    </div>
+                    <div class="col-md-5">
+                        <input type="submit" class="btn btn-default" value="Search" />
+                        <a href="/" class="btn btn-danger">Reset</a>
+                    </div>
+                </div>
+            }
+
+            @if (Model.ContactsReturn.Success)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Surname</th>
+                            <th>Telephone Number</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in Model.ContactsReturn.Contacts)
+                        {
+                            <tr>
+                                <td>@row.Name</td>
+                                <td>@row.Surname</td>
+                                <td>@row.PhoneNumber</td>
+                                <td>
+                                    <a href="/Home/Edit?Id=@row.Id">Edit</a>&nbsp;&nbsp;
+                                    <a href="/Home/Delete?Id=@row.Id">Delete</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert-danger">@Model.ContactsReturn.ErrorMessage</div>
+            } 
+        </p>
+
+    </div>
+</div>
